@@ -1,0 +1,86 @@
+# Sample output: php2shell_audit.py codebase tests/fixtures
+# Generated 2026-10-28T15:23:40Z. Legitimate detection report, not an exploit.
+
+======================================================================
+ PHP2Shell scan  (CVE-2026-109618, CVE-2026-109619)
+ mode=codebase  target=tests/fixtures
+======================================================================
+ Summary: CRITICAL:2  HIGH:1  MEDIUM:4  LOW:3  INFO:1
+
+[CRIT] Pinned PHP runtime (Dockerfile base image 'php:8.3.12-apache')
+       target : tests/fixtures/Dockerfile
+       version: 8.3.12  (VULNERABLE)
+       detail : PHP 8.3.12 is below the fixed release 8.3.36.
+       evidence: php:8.3.12-apache
+       fix    : Upgrade to the fixed release for your branch (8.2.35 / 8.3.36 / 8.4.27 / 8.5.12) and RESTART every PHP worker (FPM pool, Apache, etc.) — the running process keeps the old code until restarted.
+
+[CRIT] Pinned PHP runtime (Dockerfile base image 'php:8.2.10-fpm' (resolved from 'php:${PHP_VERSION}-fpm'))
+       target : tests/fixtures/Dockerfile.arg
+       version: 8.2.10  (VULNERABLE)
+       detail : PHP 8.2.10 is below the fixed release 8.2.35.
+       evidence: php:8.2.10-fpm
+       fix    : Upgrade to the fixed release for your branch (8.2.35 / 8.3.36 / 8.4.27 / 8.5.12) and RESTART every PHP worker (FPM pool, Apache, etc.) — the running process keeps the old code until restarted.
+
+[HIGH] Distro PHP package (php8.1)
+       target : tests/fixtures/Dockerfile.apt
+       version: 8.1  (VULNERABLE_NO_UPSTREAM_FIX)
+       detail : Installed via a package manager. PHP 8.1 is affected and has no mainline fix; a distro backport or upgrade is required.
+       evidence: php8.1
+       fix    : No mainline PHP fix exists for this branch. Use your distribution's backported package (e.g. RHEL/Debian security update) or PHP's minimal source backport, then restart workers. Verify the package changelog references the CVEs — the version number may not change.
+
+[MED ] mod_php (Apache) base image
+       target : tests/fixtures/Dockerfile
+       detail : Apache mod_php is the highest-risk SAPI for PHP2Shell.
+       evidence: php:8.3.12-apache
+       fix    : mod_php (Apache prefork) is rated the highest-risk SAPI for PHP2Shell. Prioritise patching these hosts; consider PHP-FPM.
+
+[MED ] Pinned PHP runtime (composer.json php constraint '>=8.2')
+       target : tests/fixtures/composer.json
+       version: 8.2  (BRANCH_AFFECTED_PATCH_UNKNOWN)
+       detail : PHP 8.2 is an affected branch, but the patch level is unknown. Vulnerable below 8.2.35; confirm the exact build serving requests.
+       evidence: >=8.2
+       fix    : Confirm the exact PHP build serving web requests (phpinfo / package manager), then Upgrade to the fixed release for your branch (8.2.35 / 8.3.36 / 8.4.27 / 8.5.12) and RESTART every PHP worker (FPM pool, Apache, etc.) — the running process keeps the old code until restarted.
+
+[MED ] Pinned PHP runtime (CI php-version '8.4')
+       target : tests/fixtures/.github/workflows/ci.yml
+       version: 8.4  (BRANCH_AFFECTED_PATCH_UNKNOWN)
+       detail : PHP 8.4 is an affected branch, but the patch level is unknown. Vulnerable below 8.4.27; confirm the exact build serving requests.
+       evidence: 8.4
+       fix    : Confirm the exact PHP build serving web requests (phpinfo / package manager), then Upgrade to the fixed release for your branch (8.2.35 / 8.3.36 / 8.4.27 / 8.5.12) and RESTART every PHP worker (FPM pool, Apache, etc.) — the running process keeps the old code until restarted.
+
+[MED ] session.upload_progress enabled
+       target : tests/fixtures/conf/php.ini
+       detail : session.upload_progress.enabled is On — a confirmed CVE-2026-109619 path.
+       evidence: session.upload_progress.enabled = On
+       fix    : Set session.upload_progress.enabled=0 in php.ini / the FPM pool / server config (NOT via ini_set() or .user.ini) and restart workers. This closes one confirmed path for CVE-2026-109619 but is not a complete mitigation on its own — patching is.
+
+[LOW ] fatal_error_backtraces enabled (PHP 8.5)
+       target : tests/fixtures/conf/php.ini
+       detail : A confirmed mod_php path on PHP 8.5.
+       evidence: fatal_error_backtraces = On
+       fix    : On PHP 8.5, set fatal_error_backtraces=0 administratively and restart workers — a confirmed mod_php path.
+
+[LOW ] Unbounded memory_limit
+       target : tests/fixtures/conf/php.ini
+       detail : memory_limit=-1 removes the per-request cap and raises resource-exhaustion risk.
+       evidence: memory_limit = -1
+       fix    : Constrain request size/complexity at the proxy and in PHP (post_max_size, upload_max_filesize, max_input_nesting_level, max_file_uploads). These reduce exploitability but do not replace patching.
+
+[LOW ] Large post_max_size
+       target : tests/fixtures/conf/php.ini
+       detail : post_max_size=128M widens the multipart attack surface for CVE-2026-109618.
+       evidence: post_max_size = 128M
+       fix    : Constrain request size/complexity at the proxy and in PHP (post_max_size, upload_max_filesize, max_input_nesting_level, max_file_uploads). These reduce exploitability but do not replace patching.
+
+[INFO] Pinned PHP runtime (.php-version pin)
+       target : tests/fixtures/.php-version
+       version: 8.3.36  (FIXED)
+       detail : PHP 8.3.36 is at or above the fixed release 8.3.36. (Note: distro backports may keep an older number — verify the package changelog.)
+       evidence: 8.3.36
+       fix    : No action for the engine version; keep workers restarted after the upgrade and verify config hardening.
+
+----------------------------------------------------------------------
+ NOTE: Version/config detection is non-intrusive and does not prove
+       exploitability by exploiting. A hidden version is not an all-clear.
+ AUTHORIZED USE ONLY — scan only systems you own or are explicitly permitted to assess.
+----------------------------------------------------------------------

@@ -1,0 +1,6 @@
+# One host per line. Lines starting with # are ignored.
+# host, host:port, or full URL are all accepted.
+# AUTHORIZED USE ONLY — only list systems you own or may assess.
+staging.example.com
+app.example.com:8443
+https://internal.example.com/

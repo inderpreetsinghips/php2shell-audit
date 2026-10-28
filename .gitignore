@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Reports / scratch output
+*.report.txt
+report.json
+fleet.json
+*.tmp
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# testlab generated
+testlab/lab_hosts.txt

@@ -1,0 +1,42 @@
+# Sample output: URL / live-host mode against the mock lab
+# Generated 2026-10-28T15:23:41Z. Mock targets only — detection results.
+
+$ python3 php2shell_audit.py fleet testlab/lab_hosts.txt --authorized
+
+======================================================================
+ PHP2Shell scan  (CVE-2026-109618, CVE-2026-109619)
+ mode=fleet  target=testlab/lab_hosts.txt
+======================================================================
+ Summary: CRITICAL:1  HIGH:1  MEDIUM:0  LOW:1  INFO:1
+
+[CRIT] Live PHP version via x-powered-by
+       target : 127.0.0.1:8801
+       version: 8.3.12  (VULNERABLE)
+       detail : PHP 8.3.12 is below the fixed release 8.3.36.
+       evidence: x-powered-by: PHP/8.3.12
+       fix    : Upgrade to the fixed release for your branch (8.2.35 / 8.3.36 / 8.4.27 / 8.5.12) and RESTART every PHP worker (FPM pool, Apache, etc.) — the running process keeps the old code until restarted.
+
+[HIGH] Live PHP version via x-powered-by
+       target : 127.0.0.1:8802
+       version: 8.1.20  (VULNERABLE_NO_UPSTREAM_FIX)
+       detail : PHP 8.1 is affected and has no mainline fix; a distro backport or upgrade is required.
+       evidence: x-powered-by: PHP/8.1.20
+       fix    : No mainline PHP fix exists for this branch. Use your distribution's backported package (e.g. RHEL/Debian security update) or PHP's minimal source backport, then restart workers. Verify the package changelog references the CVEs — the version number may not change.
+
+[LOW ] PHP version not disclosed
+       target : 127.0.0.1:8804
+       detail : No PHP version in Server/X-Powered-By headers. The server may hide it (good practice) — this is NOT an all-clear. Confirm the version via authenticated inventory / package manager.
+       evidence: server: nginx
+
+[INFO] Live PHP version via x-powered-by
+       target : 127.0.0.1:8803
+       version: 8.3.36  (FIXED)
+       detail : PHP 8.3.36 is at or above the fixed release 8.3.36. (Note: distro backports may keep an older number — verify the package changelog.)
+       evidence: x-powered-by: PHP/8.3.36
+       fix    : No action for the engine version; keep workers restarted after the upgrade and verify config hardening.
+
+----------------------------------------------------------------------
+ NOTE: Version/config detection is non-intrusive and does not prove
+       exploitability by exploiting. A hidden version is not an all-clear.
+ AUTHORIZED USE ONLY — scan only systems you own or are explicitly permitted to assess.
+----------------------------------------------------------------------

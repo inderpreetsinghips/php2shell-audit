@@ -1,0 +1,31 @@
+# Optional: validate the scanner against REAL PHP server header output.
+#
+# These containers run deliberately OUTDATED PHP so the scanner has a real
+# target to fingerprint. They are for DETECTION testing on an isolated local
+# machine only.
+#
+#   * Bound to 127.0.0.1 only — never expose these ports to a network.
+#   * Tear down with `docker compose down` as soon as you're done.
+#   * Prefer mock_vuln_target.py (no real vulnerable runtime) unless you
+#     specifically need real PHP header formatting.
+#
+# Usage:
+#   docker compose -f testlab/docker-compose.yml up -d
+#   python3 php2shell_audit.py host 127.0.0.1:8811 --authorized
+#   python3 php2shell_audit.py host 127.0.0.1:8812 --authorized
+#   docker compose -f testlab/docker-compose.yml down
+
+services:
+  php-vulnerable:
+    # Below the 8.3.36 fix -> scanner should report VULNERABLE (CRITICAL).
+    image: php:8.3.12-apache
+    command: sh -c "echo '<?php phpinfo();' > /var/www/html/info.php && apache2-foreground"
+    ports:
+      - "127.0.0.1:8811:80"
+
+  php-fixed:
+    # At/above the fix -> scanner should report FIXED (INFO).
+    image: php:8.3.36-apache
+    command: sh -c "echo '<?php phpinfo();' > /var/www/html/info.php && apache2-foreground"
+    ports:
+      - "127.0.0.1:8812:80"

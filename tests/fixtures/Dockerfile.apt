@@ -1,0 +1,4 @@
+FROM debian:12-slim
+RUN apt-get update && apt-get install -y \
+      php8.1-fpm php8.1-cli php8.1-mysql \
+      nginx
